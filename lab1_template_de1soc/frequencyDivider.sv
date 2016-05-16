@@ -1,14 +1,25 @@
+`default_nettype wire
+
 module frequencyDivider(clk_in, clk_out, divisor);
-	input clk_in;
-	output clk_out = 0;
-	input divisor;
-	
-	logic counter_out;
+	input logic clk_in;
+	input logic[31:0]  divisor;
+	output logic clk_out;
+
+	logic[31:0] counter_out;
 	logic counter_reset;
 	
 	counter counter(.clk(clk_in), .reset(counter_reset), .counter(counter_out));
 	
-	assign counter_reset = (counter_out == div) ? 1'b1 : 1'b0;
-	assign clk_out = (counter_reset) ? !clk_out : clk_out;
-	
+	assign counter_reset = (counter_out >= (divisor-1)) ? 1'b1 : 1'b0;
+	inverter inverter(.trigger(counter_reset), .out(clk_out)); 
+
 endmodule
+
+//module for inverter 
+module inverter(trigger, out);
+	input logic trigger; 
+	output logic out = 0; //remove = 0 for synthesis 
+	
+	always_ff @(posedge trigger)
+		out <= !out;
+endmodule 
