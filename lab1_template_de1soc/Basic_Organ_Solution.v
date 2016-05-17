@@ -227,6 +227,47 @@ wire [7:0] audio_data = {(~Sample_Clk_Signal),{7{Sample_Clk_Signal}}}; //generat
 
 
 
+//#########################################
+//#########################################
+//#########################################
+//adding code here for the scope inputs Do Re Mi Fa So La Si Do2
+wire [31:0]scope_A_title; 
+wire [31:0]Do = {character_D, character_lowercase_o, character_space, character_space}; 
+wire [31:0]Re = {character_R, character_lowercase_e, character_space, character_space}; 
+wire [31:0]Mi = {character_M, character_lowercase_i, character_space, character_space};
+wire [31:0]Fa = {character_F, character_lowercase_a, character_space, character_space};
+wire [31:0]So = {character_S, character_lowercase_o, character_space, character_space};
+wire [31:0]La = {character_L, character_lowercase_a, character_space, character_space};
+wire [31:0]Si = {character_S, character_lowercase_i, character_space, character_space};
+wire [31:0]Do2 = {character_D, character_lowercase_o, character_2, character_space}; 
+
+mux8 #(.width(32)) scopeMux(
+	.a0(Do),
+	.a1(Re),
+	.a2(Mi),
+	.a3(Fa),
+	.a4(So),
+	.a5(La),
+	.a6(Si),
+	.a7(Do2),
+	.sel(SW[3:1]),
+	.out(scope_A_title)
+	);
+  
+  
+
+
+//$$$$$$$$$$$$$$$$$$$
+//$$$$$$$$$$$$$$$$$$$
+//$$$$$$$$$$$$$$$$$$$
+//part d 
+wire [3:0] switch_0, switch_1, switch_2, switch_3; 
+
+assign switch_0 = SW[0]; 
+assign switch_1 = SW[1]; 
+assign switch_2 = SW[2]; 
+assign switch_3 = SW[3]; 
+
                 
 //=====================================================================================
 //
@@ -292,8 +333,8 @@ LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                     .clk(CLK_50M),  //don't touch
                           
                         //LCD Display values
-                      .InH(8'hAA),
-                      .InG(8'hBB),
+                      .InH({switch_3, switch_2}),
+                      .InG({switch_1, switch_0}),
                       .InF(8'h01),
                        .InE(8'h23),
                       .InD(8'h45),
@@ -302,14 +343,14 @@ LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                      .InA(8'h00),
                           
                      //LCD display information signals
-                         .InfoH({character_A,character_U}),
-                          .InfoG({character_S,character_W}),
-                          .InfoF({character_space,character_A}),
-                          .InfoE({character_N,character_space}),
-                          .InfoD({character_E,character_X}),
-                          .InfoC({character_A,character_M}),
-                          .InfoB({character_P,character_L}),
-                          .InfoA({character_E,character_exclaim}),
+									.InfoH({character_L,character_A}),
+									.InfoG({character_B,character_1}),
+									.InfoF({character_space,character_A}),
+									.InfoE({character_L,character_E}),
+									.InfoD({character_X,character_space}),
+									.InfoC({character_plus,character_space}),
+									.InfoB({character_S,character_E}),
+									.InfoA({character_A,character_N}),
                           
                   //choose to display the values or the oscilloscope
                           .choose_scope_or_LCD(choose_LCD_or_SCOPE),
@@ -319,7 +360,7 @@ LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                           .scope_channelB(scope_channelB), //don't touch
                           
                   //scope information generation
-                          .ScopeInfoA({character_1,character_K,character_H,character_lowercase_z}),
+                          .ScopeInfoA(scope_A_title),
                           .ScopeInfoB({character_S,character_W,character_1,character_space}),
                           
                  //enable_scope is used to freeze the scope just before capturing 
