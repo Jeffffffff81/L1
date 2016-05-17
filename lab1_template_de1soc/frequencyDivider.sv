@@ -3,18 +3,22 @@
 module frequencyDivider(clk_in, clk_out, divisor);
 	input logic clk_in;
 	input logic[31:0]  divisor;
-	output reg clk_out;
+	output reg clk_out = 0;
 
-	logic[31:0] counter_out;
-	logic counter_reset;
-	logic pre_clk_out;
+	reg[31:0] counter = 0;
+	reg reset_counter = 0 ;
 	
-	counter counter(.clk(clk_in), .reset(counter_reset), .counter(counter_out));
-	vDFF #(.width(1)) flipflip(.in(!pre_clk_out), .out(pre_clk_out), .clk(counter_reset));
+	always_ff @(posedge clk_in)
+		if(counter == divisor) begin
+			counter <= 0;
+			reset_counter <= 1;
+		end else begin
+			counter <= counter+1;
+			reset_counter <= 0;
+		end
+		
+	always_ff @(posedge reset_counter)
+		clk_out = !clk_out;
 	
-	assign counter_reset = (counter_out >= (divisor-1)) ? 1'b1 : 1'b0;
-	assign clk_out = pre_clk_out;
-	
-
 endmodule
 
