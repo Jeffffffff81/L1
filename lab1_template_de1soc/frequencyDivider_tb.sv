@@ -12,17 +12,17 @@ module frequencyDivider_tb ();
 
    initial begin 
       //initially set clk to 0
-      clk_in = 0 ; #5;
+      clk_in = 0 ; #1;
       
       //keep the clock cycling back and forth between 1 and 0
       forever begin 
-         clk_in = 1; #5;
-         clk_in = 0; #5; 
+         clk_in = 1; #1;
+         clk_in = 0; #1; 
       end
    end
 
   initial begin 
-       divisor = 2;
+       divisor = 11;
        #100;
 
        $stop;

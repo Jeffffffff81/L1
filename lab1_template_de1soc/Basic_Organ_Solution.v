@@ -201,7 +201,7 @@ wire Sample_Clk_Signal;
 //
 //587Hz 523Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
            
-mux8 #(.width(32)) toneMuxa(
+mux8 #(.width(32)) toneMux(
 	.a0(32'd47800), //-1
 	.a1(32'd42590),
 	.a2(32'd37936),
@@ -211,33 +211,13 @@ mux8 #(.width(32)) toneMuxa(
 	.a6(32'd25329),
 	.a7(32'd23900),//good
 	.sel(SW[3:1]),
-	.out(divisorWire4a)
+	.out(divisorWire)
 	);
 	
-	mux8 #(.width(32)) toneMuxb(
-	.a0(32'd47801),
-	.a1(32'd42590),
-	.a2(32'd37936),
-	.a3(32'd35817),
-	.a4(32'd31929),
-	.a5(32'd28409),
-	.a6(32'd25329),
-	.a7(32'd23900),
-	.sel(SW[3:1]),
-	.out(divisorWire4b)
-	);
 	  
-wire[31:0] divisorWire4a;
-wire[31:0] divisorWire4b;
+wire[31:0] divisorWire;
 wire toneWire;
-
-Generate_Arbitrary_Divided_Clk32 frequencyDivider(
-.inclk(CLOCK_50),
-.outclk(toneWire),
-.Not_outclk(),
-.div_clk_count(SW[4] ? divisorWire4b : divisorWire4a),
-.Reset(1'b1)
-);
+frequencyDivider(.clk_in(CLK_50M), .clk_out(toneWire), .divisor(divisorWire));
 				
 assign Sample_Clk_Signal = SW[0] ? toneWire : 0;
 
