@@ -199,7 +199,7 @@ wire Sample_Clk_Signal;
 //
 // Insert your code for Lab1 here!
 //
-//587Hz 523Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
+//523Hz 587Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
            
 mux8 #(.width(32)) toneMux(
 	.a0(32'd47800),
@@ -217,7 +217,7 @@ mux8 #(.width(32)) toneMux(
 	  
 wire[31:0] divisorWire;
 wire toneWire;
-frequencyDivider(.clk_in(CLK_50M), .clk_out(toneWire), .divisor(divisorWire));
+frequencyDivider freqDiv(.clk_in(CLK_50M), .clk_out(toneWire), .divisor(divisorWire));
 				
 assign Sample_Clk_Signal = SW[0] ? toneWire : 0;
 
