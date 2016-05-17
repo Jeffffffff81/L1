@@ -202,14 +202,14 @@ wire Sample_Clk_Signal;
 //587Hz 523Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
            
 mux8 #(.width(32)) toneMux(
-	.a0(32'd47800), //-1
+	.a0(32'd47800),
 	.a1(32'd42590),
 	.a2(32'd37936),
 	.a3(32'd35817),
-	.a4(32'd31929),//good
+	.a4(32'd31929),
 	.a5(32'd28409),
 	.a6(32'd25329),
-	.a7(32'd23900),//good
+	.a7(32'd23900),
 	.sel(SW[3:1]),
 	.out(divisorWire)
 	);

@@ -3,19 +3,14 @@
 module frequencyDivider(clk_in, clk_out, divisor);
 	input logic clk_in;
 	input logic[31:0]  divisor;
-	output reg clk_out = 0;
+	output reg clk_out;
 
-	reg[31:0] counter = 0;
-	reg reset_counter = 0 ;
+	logic[31:0] counter_out;
+	logic reset_counter ;
 	
-	always_ff @(posedge clk_in)
-		if(counter == divisor) begin
-			counter <= 0;
-			reset_counter <= 1;
-		end else begin
-			counter <= counter+1;
-			reset_counter <= 0;
-		end
+	assign reset_counter = (divisor == counter_out);
+	
+	counter counter(.clk(clk_in), .reset(reset_counter), .counter(counter_out));
 		
 	always_ff @(posedge reset_counter)
 		clk_out = !clk_out;
