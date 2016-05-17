@@ -169,7 +169,7 @@ parameter character_lowercase_r= 8'h72;
 parameter character_lowercase_s= 8'h73;
 parameter character_lowercase_t= 8'h74;
 parameter character_lowercase_u= 8'h75;
-parameter character_lowercase_v= 8'h76;
+parameter character5_lowercase_v= 8'h76;
 parameter character_lowercase_w= 8'h77;
 parameter character_lowercase_x= 8'h78;
 parameter character_lowercase_y= 8'h79;
@@ -199,17 +199,47 @@ wire Sample_Clk_Signal;
 //
 // Insert your code for Lab1 here!
 //
-//
-            
+//587Hz 523Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
+           
+mux8 #(.width(32)) toneMuxa(
+	.a0(32'd47800), //-1
+	.a1(32'd42590),
+	.a2(32'd37936),
+	.a3(32'd35817),
+	.a4(32'd31929),//good
+	.a5(32'd28409),
+	.a6(32'd25329),
+	.a7(32'd23900),//good
+	.sel(SW[3:1]),
+	.out(divisorWire4a)
+	);
+	
+	mux8 #(.width(32)) toneMuxb(
+	.a0(32'd47801),
+	.a1(32'd42590),
+	.a2(32'd37936),
+	.a3(32'd35817),
+	.a4(32'd31929),
+	.a5(32'd28409),
+	.a6(32'd25329),
+	.a7(32'd23900),
+	.sel(SW[3:1]),
+	.out(divisorWire4b)
+	);
+	  
+wire[31:0] divisorWire4a;
+wire[31:0] divisorWire4b;
+wire toneWire;
 
-
-
-
-
-
-            
-
-assign Sample_Clk_Signal = Clock_1KHz;
+Generate_Arbitrary_Divided_Clk32 frequencyDivider(
+.inclk(CLOCK_50),
+.outclk(toneWire),
+.Not_outclk(),
+.div_clk_count(SW[4] ? divisorWire4b : divisorWire4a),
+.Reset(1'b1)
+);
+				
+assign Sample_Clk_Signal = SW[0] ? toneWire : 0;
 
 //Audio Generation Signal
 //Note that the audio needs signed data - so convert 1 bit to 8 bits signed

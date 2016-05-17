@@ -15,10 +15,10 @@ module frequencyDivider(clk_in, clk_out, divisor);
 
 endmodule
 
-//module for inverter 
+
 module inverter(trigger, out);
 	input logic trigger; 
-	output logic out = 0; //remove = 0 for synthesis 
+	output logic out; //remove = 0 for synthesis 
 	
 	always_ff @(posedge trigger)
 		out <= !out;
