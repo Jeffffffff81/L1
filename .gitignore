@@ -1,9 +1,7 @@
-#Ignore everything
 *
-lab1_template_de1soc/Basic_Organ_Solution.done
 
-#Except
 !.gitignore
 !*.v
 !*.sv
+!*.qpf
 !*/

@@ -87,7 +87,7 @@ inout           [35:0]      GPIO_1;
 logic CLK_50M;
 logic  [7:0] LED;
 assign CLK_50M =  CLOCK_50;
-assign LEDR[7:0] = LED[7:0];
+//assign LEDR[7:0] = LED[7:0];
 
 
 wire            [7:0]      LCD_DATA;
@@ -268,7 +268,87 @@ assign switch_1 = SW[1];
 assign switch_2 = SW[2]; 
 assign switch_3 = SW[3]; 
 
-                
+
+wire [15:0] frequency_info; 
+
+always @(*) 
+	case (SW[3:1])
+			3'b000: frequency_info = 16'h20B;
+			3'b001: frequency_info = 16'h24B;
+			3'b010: frequency_info = 16'h293;
+			3'b011: frequency_info = 16'h2BA;
+			3'b100: frequency_info = 16'h30F;
+			3'b101: frequency_info = 16'h3DB;
+			3'b110: frequency_info = 16'h370;
+			3'b111: frequency_info = 16'h416;
+			default: frequency_info = 0;
+	endcase            
+				 
+					 
+
+//********************************
+//**********************************************************************
+//part E
+	parameter S0 = 4'b0000;
+	parameter S1 = 4'b0001;
+	parameter S2 = 4'b0010;
+	parameter S3 = 4'b0011;
+	parameter S4 = 4'b0100;
+	parameter S5 = 4'b0101;
+	parameter S6 = 4'b0110;
+	parameter S7 = 4'b0111;
+	
+	parameter S8 = 4'b1000;
+	parameter S9 = 4'b1001;
+	parameter S10 = 4'b1010;
+	parameter S11 = 4'b1011;
+	parameter S12 = 4'b1100;
+	parameter S13 = 4'b1101;
+	parameter S14 = 4'b1110;
+
+
+//states for the state machine
+  wire [3:0] present_state;
+  //wire [2:0] next_state_reset; 
+  reg [3:0] next_state;
+  reg [7:0] out; 
+
+  
+  //3-bit register 
+  vDFF #(4) STATE(Clock_1Hz, next_state, present_state);
+
+  //logic for the rest button 
+  //assign next_state_reset = S0; 
+  
+  reg direction; 
+  assign LEDR[7:0] = out; 
+ 
+  //next state and output logic 
+  always @(*) begin
+	case (present_state)
+	   S0: {next_state, out} = { S1, 8'b00000001} ;
+	   S1: {next_state, out} = { S2, 8'b00000010 } ;
+      S2: {next_state, out} = { S3, 8'b00000100 } ;
+  	   S3: {next_state, out} = { S4, 8'b00001000 } ;
+	   S4: {next_state, out} = { S5, 8'b00010000 } ;
+	   S5: {next_state, out} = { S6, 8'b00100000 } ;
+	   S6: {next_state, out} = { S7, 8'b01000000 } ;
+	   S7: {next_state, out} = { S8, 8'b10000000 } ;
+	   S8: {next_state, out} = { S9, 8'b01000000} ;
+	   S9: {next_state, out} = { S10, 8'b00100000 } ;
+      S10: {next_state, out} = { S11, 8'b00010000 } ;
+  	   S11: {next_state, out} = { S12, 8'b00001000 } ;
+	   S12: {next_state, out} = { S13, 8'b00000100 } ;
+	   S13: {next_state, out} = { S0, 8'b00000010 } ;
+		 
+	   default: {next_state, out} = { S1, 8'b000000001} ; 
+	endcase 	
+   end	
+
+
+
+					 
+					 
 //=====================================================================================
 //
 // LCD Scope Acquisition Circuitry Wire Definitions                 
@@ -323,21 +403,6 @@ scope_capture LCD_scope_channelB
 .reset(1'b1));
 
 assign LCD_ON   = 1'b1;
-
-wire [15:0] frequency_info; 
-always @(*)
-	case (SW[3:1])
-			3'b000: frequency_info = 16'h20B;
-			3'b001: frequency_info = 16'h24B;
-			3'b010: frequency_info = 16'h293;
-			3'b011: frequency_info = 16'h2BA;
-			3'b100: frequency_info = 16'h30F;
-			3'b101: frequency_info = 16'h3DB;
-			3'b110: frequency_info = 16'h370;
-			3'b111: frequency_info = 16'h416;
-			default: frequency_info = 0;
-	endcase 
-
 //The LCD scope and display
 LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                         //LCD control signals
@@ -612,4 +677,17 @@ audio_control(
 //========================================================================================================================
                     
             
+endmodule 
+
+
+//define flip flp 
+module vDFF(clk, in, out) ;
+  parameter n = 1;
+  input clk;
+  input [n-1:0] in;
+  output [n-1:0] out;
+  reg [n-1:0] out;
+  
+  always @(posedge clk)
+      out = in;
 endmodule
