@@ -317,7 +317,7 @@ always @(*)
 
   
   //3-bit register 
-  vDFF #(3) STATE(Clock_1Hz, next_state, present_state);
+  vDFF #(4) STATE(Clock_1Hz, next_state, present_state);
 
   //logic for the rest button 
   //assign next_state_reset = S0; 
