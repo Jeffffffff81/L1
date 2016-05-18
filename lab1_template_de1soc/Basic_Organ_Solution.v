@@ -323,6 +323,21 @@ scope_capture LCD_scope_channelB
 .reset(1'b1));
 
 assign LCD_ON   = 1'b1;
+
+wire [15:0] frequency_info; 
+always @(*)
+	case (SW[3:1])
+			3'b000: frequency_info = 16'h20B;
+			3'b001: frequency_info = 16'h24B;
+			3'b010: frequency_info = 16'h293;
+			3'b011: frequency_info = 16'h2BA;
+			3'b100: frequency_info = 16'h30F;
+			3'b101: frequency_info = 16'h3DB;
+			3'b110: frequency_info = 16'h370;
+			3'b111: frequency_info = 16'h416;
+			default: frequency_info = 0;
+	endcase 
+
 //The LCD scope and display
 LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                         //LCD control signals
@@ -335,12 +350,12 @@ LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                         //LCD Display values
                       .InH({switch_3, switch_2}),
                       .InG({switch_1, switch_0}),
-                      .InF(8'h01),
-                       .InE(8'h23),
-                      .InD(8'h45),
-                      .InC(8'h67),
-                      .InB(8'h89),
-                     .InA(8'h00),
+                      .InF(8'h00),
+                       .InE(8'h00),
+                      .InD(8'h00),
+                      .InC(8'h00),
+                      .InB(frequency_info[15:8]),
+                     .InA(frequency_info[7:0]),
                           
                      //LCD display information signals
 									.InfoH({character_L,character_A}),
