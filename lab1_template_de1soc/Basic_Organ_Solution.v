@@ -199,8 +199,9 @@ wire Sample_Clk_Signal;
 //
 // Insert your code for Lab1 here!
 //
-//523Hz 587Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz
-           
+
+//part a 
+//523Hz 587Hz 659Hz 698Hz 783Hz 987Hz 880hz 1046Hz          
 mux8 #(.width(32)) toneMux(
 	.a0(32'd47800),
 	.a1(32'd42590),
@@ -218,7 +219,9 @@ mux8 #(.width(32)) toneMux(
 wire[31:0] divisorWire;
 wire toneWire;
 frequencyDivider freqDiv(.clk_in(CLK_50M), .clk_out(toneWire), .divisor(divisorWire));
-				
+
+//part b	
+//frequency of 0 turns Sample_Clk_signal off 			
 assign Sample_Clk_Signal = SW[0] ? toneWire : 0;
 
 //Audio Generation Signal
@@ -226,12 +229,9 @@ assign Sample_Clk_Signal = SW[0] ? toneWire : 0;
 wire [7:0] audio_data = {(~Sample_Clk_Signal),{7{Sample_Clk_Signal}}}; //generate signed sample audio signal
 
 
+//part c: the scope inputs Do Re Mi Fa So La Si Do2
+wire [31:0]scope_A_title; //this wire is an input to ScopeInfoA in the module: LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope
 
-//#########################################
-//#########################################
-//#########################################
-//adding code here for the scope inputs Do Re Mi Fa So La Si Do2
-wire [31:0]scope_A_title; 
 wire [31:0]Do = {character_D, character_lowercase_o, character_space, character_space}; 
 wire [31:0]Re = {character_R, character_lowercase_e, character_space, character_space}; 
 wire [31:0]Mi = {character_M, character_lowercase_i, character_space, character_space};
@@ -255,20 +255,17 @@ mux8 #(.width(32)) scopeMux(
 	);
   
   
-
-
-//$$$$$$$$$$$$$$$$$$$
-//$$$$$$$$$$$$$$$$$$$
-//$$$$$$$$$$$$$$$$$$$
 //part d 
+//each switch will need to be 4 bits for when we concatenate the inputs for the module LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope
 wire [3:0] switch_0, switch_1, switch_2, switch_3; 
 
+//each switch will either be represented with a 1 or 0 (in hex) depending on its state 
 assign switch_0 = SW[0]; 
 assign switch_1 = SW[1]; 
 assign switch_2 = SW[2]; 
 assign switch_3 = SW[3]; 
 
-
+//frequency_info gets one of the eight frequencies (the one currently being generated) in hexadecimal 
 wire [15:0] frequency_info; 
 
 always @(*) 
@@ -285,71 +282,59 @@ always @(*)
 	endcase            
 				 
 					 
-
-//********************************
-//**********************************************************************
 //part E
-	parameter S0 = 4'b0000;
-	parameter S1 = 4'b0001;
-	parameter S2 = 4'b0010;
-	parameter S3 = 4'b0011;
-	parameter S4 = 4'b0100;
-	parameter S5 = 4'b0101;
-	parameter S6 = 4'b0110;
-	parameter S7 = 4'b0111;
-	
-	parameter S8 = 4'b1000;
-	parameter S9 = 4'b1001;
-	parameter S10 = 4'b1010;
-	parameter S11 = 4'b1011;
-	parameter S12 = 4'b1100;
-	parameter S13 = 4'b1101;
-	parameter S14 = 4'b1110;
-
-//typedef enum logic [4:0] {S0,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14};
+parameter S0 = 4'b0000;
+parameter S1 = 4'b0001;
+parameter S2 = 4'b0010;
+parameter S3 = 4'b0011;
+parameter S4 = 4'b0100;
+parameter S5 = 4'b0101;
+parameter S6 = 4'b0110;
+parameter S7 = 4'b0111;
+parameter S8 = 4'b1000;
+parameter S9 = 4'b1001;
+parameter S10 = 4'b1010;
+parameter S11 = 4'b1011;
+parameter S12 = 4'b1100;
+parameter S13 = 4'b1101;
+parameter S14 = 4'b1110;
 
 
 //states for the state machine
-  wire [2:0] present_state;
-  //wire [2:0] next_state_reset; 
-  reg [2:0] next_state;
-  reg [7:0] out; 
+reg [3:0] present_state;
+reg [3:0] next_state;
+
+//output for LEDR, out controls 8 of the red LEDs on the DE1-soC (LEDR[7:0]) 
+reg [7:0] out; 
 
   
-  //3-bit register 
-  vDFF #(4) STATE(Clock_1Hz, next_state, present_state);
+//4-bit register 
+always @(posedge Clock_1Hz)
+  present_state = next_state;
 
-  //logic for the rest button 
-  //assign next_state_reset = S0; 
-  
-  reg direction; 
-  assign LEDR[7:0] = out; 
+reg direction; 
+assign LEDR[7:0] = out; 
  
-  //next state and output logic 
-  always @(*) begin
-	case (present_state)
-	   S0 : {next_state, out} = { S1, 8'b00000001} ;
+//next state and output logic 
+always @(*) begin
+  case (present_state)
+	   S0: {next_state, out} = { S1, 8'b00000001} ;
 	   S1: {next_state, out} = { S2, 8'b00000010 } ;
-       S2: {next_state, out} = { S3, 8'b00000100 } ;
+      S2: {next_state, out} = { S3, 8'b00000100 } ;
   	   S3: {next_state, out} = { S4, 8'b00001000 } ;
 	   S4: {next_state, out} = { S5, 8'b00010000 } ;
 	   S5: {next_state, out} = { S6, 8'b00100000 } ;
 	   S6: {next_state, out} = { S7, 8'b01000000 } ;
 	   S7: {next_state, out} = { S8, 8'b10000000 } ;
-	   S8 : {next_state, out} = { S9, 8'b01000000} ;
+	   S8: {next_state, out} = { S9, 8'b01000000} ;
 	   S9: {next_state, out} = { S10, 8'b00100000 } ;
-       S10: {next_state, out} = { S11, 8'b00100000 } ;
-  	   S11: {next_state, out} = { S12, 8'b00010000 } ;
-	   S12: {next_state, out} = { S13, 8'b00001000 } ;
-	   S13: {next_state, out} = { S14, 8'b00000100 } ;
-	   S14: {next_state, out} = { S0, 8'b00000010 } ;
-		 
-	   default: {next_state, out} = { S1, 8'b00000001} ; 
-	endcase 	
-   end	
-
-
-
+      S10: {next_state, out} = { S11, 8'b00010000 } ;
+  	   S11: {next_state, out} = { S12, 8'b00001000 } ;
+	   S12: {next_state, out} = { S13, 8'b00000100 } ;
+	   S13: {next_state, out} = { S0, 8'b00000010 } ;
+	   default: {next_state, out} = { S1, 8'b000000001} ; 
+  endcase 	
+end	
 					 
 					 
 //=====================================================================================
@@ -443,7 +428,7 @@ LCD_Scope_Encapsulated_pacoblaze_wrapper LCD_LED_scope(
                           .scope_channelB(scope_channelB), //don't touch
                           
                   //scope information generation
-                          .ScopeInfoA(scope_A_title),
+                          .ScopeInfoA(scope_A_title), //changed this input to scope_A_title
                           .ScopeInfoB({character_S,character_W,character_1,character_space}),
                           
                  //enable_scope is used to freeze the scope just before capturing 
@@ -681,16 +666,3 @@ audio_control(
                     
             
 endmodule 
-
-
-//define flip flp 
-module vDFF(clk, in, out) ;
-  parameter n = 1;
-  input clk;
-  input [n-1:0] in;
-  output [n-1:0] out;
-  reg [n-1:0] out;
-  
-  always @(posedge clk)
-      out = in;
-endmodule
